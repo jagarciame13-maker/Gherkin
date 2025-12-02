@@ -1,21 +1,31 @@
 from pytest_bdd import scenarios, given, when, then, parsers
 
-# Vincula el archivo .feature
+# Cargar escenarios desde la carpeta tests
 scenarios("votar.feature")
 
 def puede_votar(edad):
     return "Sí puede votar" if edad >= 18 else "No puede votar"
 
-@given(parsers.parse("que la persona tiene {edad:d} años"))
-def edad_persona(edad):
+# -----------------------
+#       GIVEN
+# -----------------------
+@given(parsers.parse("que la persona tiene {edad:d} años"), target_fixture="contexto")
+def given_edad(edad):
     return {"edad": edad}
 
+# -----------------------
+#        WHEN
+# -----------------------
 @when("se verifica si puede votar")
-def verificar(edad_persona):
-    resultado = puede_votar(edad_persona["edad"])
-    edad_persona["resultado"] = resultado
-    return edad_persona
+def when_verifica(contexto):
+    resultado = puede_votar(contexto["edad"])
+    contexto["resultado"] = resultado
+    return contexto
 
+# -----------------------
+#        THEN
+# -----------------------
 @then(parsers.parse('el resultado debe ser "{texto}"'))
-def validar(edad_persona, texto):
-    assert edad_persona["resultado"] == texto
+def then_resultado(contexto, texto):
+    assert contexto["resultado"] == texto
+
